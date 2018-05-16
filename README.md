@@ -5,4 +5,10 @@ Model kaczki jest wykonany przeze mnie.
 
 Aby zagrać należy włączyć build o nazwie server i nacisnąć start(nie wpisywać portu), następnie uruchomić build 'klient' i wpisać tylko imie gracza.
 
+Sterowanie:
+-myszka: kierowanie 
+-lewy przycisk myszy: dodanie kaczki
+-prawy przycisk myszy: strzelanie kaczką
+-spacja: rozpędzanie kaczki
+
 Projekt nieukończony.
