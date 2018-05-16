@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class AvatarController : MonoBehaviour {
+    /* skrypt odpowiadający za sterowanie innymi graczami po stronie klienta na podstawie informacji od servera*/
+
     private Vector3 pos;
     private float dis = 1;
     private float startTime;
@@ -12,16 +14,15 @@ public class AvatarController : MonoBehaviour {
 
     void Update()
     {
-
-            transform.position = Vector3.Lerp(transform.position, pos, dis * speed);
-
-        UpdateRot();
+        // transform.position = Vector3.Lerp(transform.position, pos, dis * speed);
+        transform.position = pos;
+        //UpdateRot();
     }
 
 
     public void UpdatePos(Vector3 _pos)
     {
-        dis = Vector3.Distance(transform.position, _pos);
+        //dis = Vector3.Distance(transform.position, _pos);
         pos = _pos;
 
 

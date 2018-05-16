@@ -14,7 +14,7 @@ public class Player
 public class Client : MonoBehaviour
 {
 
-    private const int MAX_CONNECTION = 100;
+    private const int MAX_CONNECTION = 10;
 
     private int port = 3001;
     private string ip = "127.0.0.1";
@@ -49,6 +49,9 @@ public class Client : MonoBehaviour
         string IpField = GameObject.Find("IpInput").GetComponent<InputField>().text;
         if (IpField != "")
             ip = GameObject.Find("IpInput").GetComponent<InputField>().text;
+        string PortField = GameObject.Find("PortInput").GetComponent<InputField>().text;
+        if (PortField != "")
+            port = int.Parse(PortField);
 
         playerName = pName;
 
@@ -62,7 +65,7 @@ public class Client : MonoBehaviour
 
         hostId = NetworkTransport.AddHost(topo, 0);
         connectionId = NetworkTransport.Connect(hostId, ip, port, 0, out error);
-
+        Debug.Log(error.ToString());
         connectionTime = Time.time;
         isConnected = true;
 
@@ -87,9 +90,9 @@ public class Client : MonoBehaviour
             case NetworkEventType.DataEvent:
                 string msg = Encoding.Unicode.GetString(recBuffer, 0, dataSize);
                // Debug.Log("Receiveing: " + msg);
-                string[] splitData = msg.Split('|');
+                string[] splitData = msg.Split('|');    
 
-                switch (splitData[0])
+                switch (splitData[0])           // dekodowanie przyjętej wiadomości na podstawie słów kluczowych
                 {
                     case "ASKNAME":
                         OnAskName(splitData);
@@ -123,11 +126,11 @@ public class Client : MonoBehaviour
 
     }
 
-    private void OnAskName(string[] data)
+    private void OnAskName(string[] data)       //gdy server zapyta o twoje imie
     {
         ourClientId = int.Parse(data[1]);
 
-        Send("NAMEIS|" + playerName, reliableChannel);
+        Send("NAMEIS|" + playerName, reliableChannel);      
 
 
         for (int i = 2; i < data.Length - 1; i++)
@@ -151,7 +154,7 @@ public class Client : MonoBehaviour
                 players[int.Parse(d[0])].avatar.GetComponent<AvatarController>().UpdatePos(position);
             }
         }
-        Vector3 myPosition = players[ourClientId].avatar.GetComponent<PlayerController>().waypoint;
+        Vector3 myPosition = players[ourClientId].avatar.transform.position;
 
         string m = "MYPOSITION|" + myPosition.x.ToString() + '|' + myPosition.z.ToString();
 
@@ -177,21 +180,27 @@ public class Client : MonoBehaviour
         if (cnnId == ourClientId)
         {
             GameObject.Find("CameraHang").GetComponent<CameraMove>().Mother = go;
+            go.AddComponent<Rigidbody>();
             go.AddComponent<PlayerController>();
+            
             GameObject.Find("Canvas").SetActive(false);
             isStarted = true;
         }
         else
+        {
             go.AddComponent<AvatarController>();
+            go.tag = "Enemy";
+
+        }
 
         Player p = new Player();
+        players.Add(cnnId, p);
         p.avatar = go;
         p.playerName = playerName;
         p.connectionId = cnnId;
         p.avatar.GetComponentInChildren<TextMesh>().text = playerName;
         for(int i = 0; i<childCount;i++)
         p.avatar.GetComponent<HordeHandler>().LocalAddDuck();
-        players.Add(cnnId, p);
 
 
 
@@ -210,7 +219,7 @@ public class Client : MonoBehaviour
 
     }
 
-    //od klienta
+    //dodawanie/ usuwanie małych kaczek
     public void AddChild()
     {
         Send("ADDCHILD|", reliableChannel);

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class HordeHandler : MonoBehaviour {
+    /* zarzadzanie stadkiem malych kaczek, kontrola nad ich ilością, ustawianie ich w kolejke, strzelanie i dodawanie ich*/
 	public GameObject childDuck;
 	private GameObject oldest;
 	private GameObject youngest;

@@ -3,14 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour {
-
+    /* kontrolowanie kaczki gracza*/
 
     public float rotSpeed = 10;
     public float maxSpeed = 0.07f;
     public float minSpeed = 0.03f;
     private HordeHandler hordeHandler;
     private Client client;
-    public Vector3 waypoint; 
+    public Vector3 waypoint;
+    Vector3 dst = Vector3.zero;
 
     void Start()
     {
@@ -18,21 +19,20 @@ public class PlayerController : MonoBehaviour {
         client = GameObject.Find("Client").GetComponent<Client>();
     }
     void Update () {
-        Vector3 dst = TrackMouse();
+        dst = TrackMouse();
         float speed = maxSpeed;
         dst.y = 0.4f;
 
-        waypoint = dst;
-        transform.position = Vector3.Lerp(transform.position, dst, speed);
-
-        
+        waypoint = transform.position;
+       // transform.position = Vector3.Lerp(transform.position, dst, speed);
+  
 
         Quaternion lookRotation = Quaternion.LookRotation((dst - transform.position).normalized);
         transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * rotSpeed);
+        
 
 
-
-
+        
         if (Input.GetButtonDown("Fire1"))
         {
             if (hordeHandler.LocalAddDuck())
@@ -48,10 +48,20 @@ public class PlayerController : MonoBehaviour {
 
         }
 
+        
+        
 
     }
+    private void FixedUpdate()
+    {
+        if(dst != Vector3.zero && Input.GetKey(KeyCode.Space))
+        GetComponent<Rigidbody>().AddForce(dst - transform.position );
+        Debug.Log(-dst * 50);
+        if (transform.position.y < 0)
+            GetComponent<Rigidbody>().AddForce(new Vector3(0, 20, 0));
+    }
 
-   private Vector3 TrackMouse()
+    private Vector3 TrackMouse()
     {
         Vector3 dst = transform.position;
         RaycastHit hit;
@@ -62,7 +72,7 @@ public class PlayerController : MonoBehaviour {
         if (Physics.Raycast(ray, out hit))
             if (hit.collider != null)
             {
-                dst = new Vector3(hit.point.x, transform.position.y, hit.point.z);
+                dst = new Vector3(hit.point.x, 0, hit.point.z);
                 dst = CheckObsticle(dst);
             }
             else

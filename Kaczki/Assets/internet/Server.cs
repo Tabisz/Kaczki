@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 using System.Text;
 using System;
+using UnityEngine.UI;
 
 public class ServerClient
 {
@@ -35,7 +36,7 @@ public class Server : MonoBehaviour
     private float lastMovementUpdate;
     public float movementUpdateRate = 0.05f;
 
-    void Start()
+    public void StartServer()
     {
         NetworkTransport.Init();
         ConnectionConfig cc = new ConnectionConfig();
@@ -45,11 +46,14 @@ public class Server : MonoBehaviour
 
         HostTopology topo = new HostTopology(cc, MAX_CONNECTION);
 
+        string PortField = GameObject.Find("PortInput").GetComponent<InputField>().text;
+        if (PortField != "")
+            port = int.Parse(PortField);
+
         hostId = NetworkTransport.AddHost(topo, port, null);
         webHostId = NetworkTransport.AddWebsocketHost(topo, port, null);
-
+        Debug.Log("Starting server on port: " + port);
         isStarted = true;
-
     }
 
     void Update()
@@ -73,7 +77,7 @@ public class Server : MonoBehaviour
                 break;
             case NetworkEventType.DataEvent:
                 string msg = Encoding.Unicode.GetString(recBuffer, 0, dataSize);
-                Debug.Log("Receiving from " + connectionId + " : " + msg);
+                //Debug.Log("Receiving from " + connectionId + " : " + msg);
 
                 string[] splitData = msg.Split('|');
 
@@ -108,7 +112,7 @@ public class Server : MonoBehaviour
             lastMovementUpdate = Time.time;
             string m = "ASKPOSITION|";
             foreach (ServerClient sc in clients)
-                m += sc.connectionId.ToString() + '%' + sc.position.x.ToString() + '%' + sc.position.z.ToString() + '%' + '|';
+                m += sc.connectionId.ToString() + '%' + sc.position.x.ToString() + '%' + sc.position.z.ToString() + '%'+ '|';
             m = m.Trim('|');
 
             Send(m, unreliableChannel, clients);

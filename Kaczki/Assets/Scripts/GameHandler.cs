@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class GameHandler : MonoBehaviour {
+    /* nieużywany skrypt do obsługi wrogów*/
 	public GameObject Enemy;
 	public GameObject Mother;
 	public int maxEnemy;
